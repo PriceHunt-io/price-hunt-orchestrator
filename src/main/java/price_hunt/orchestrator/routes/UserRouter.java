@@ -37,7 +37,9 @@ public class UserRouter extends RouteBuilder {
                 .log("Criando usuário: ${body}")
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .marshal().json(JsonLibrary.Jackson)
-                .to("https://price-hunt-api.onrender.com/user?bridgeEndpoint=true").unmarshal("jsonDataFormat");
+                .to("https://price-hunt-api.onrender.com/user?bridgeEndpoint=true")
+                .log("Mensagem crua recebida: ${body}")
+                .unmarshal("jsonDataFormat");
 
         from("direct:findById")
                 .routeId("findUserById")
