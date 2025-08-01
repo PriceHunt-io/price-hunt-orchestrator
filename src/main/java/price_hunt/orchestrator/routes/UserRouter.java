@@ -37,6 +37,7 @@ public class UserRouter extends RouteBuilder {
                 .log("Criando usuário: ${body}")
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+                .setHeader("Accept-Encoding", constant("identity"))
                 .marshal().json(JsonLibrary.Jackson)
                 .to("https://price-hunt-api.onrender.com/user?bridgeEndpoint=true")
                 .convertBodyTo(String.class)
