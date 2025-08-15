@@ -8,41 +8,42 @@ import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.rest.RestBindingMode;
 
 import org.springframework.stereotype.Component;
-import price_hunt.orchestrator.DTO.UserDTO;
+import price_hunt.orchestrator.DTO.StoreDTO;
 
-import java.time.LocalDate;
-import java.time.Period;
+
+
 @Component
-public class UserRouter extends RouteBuilder {
+public class StoreRouter extends RouteBuilder {
     public void configure() {
         // Configurações do Camel e de padrões de formatos
         restConfiguration().component("servlet").bindingMode(RestBindingMode.json).dataFormatProperty("objectMapper", "#objectMapper").contextPath("/api").port(8080);
 
         // Rotas disponíveis do orquestrador
-        rest("/user")
+        rest("/store")
                 .post()
-                    .consumes("application/json")
-                    .produces("application/json")
-                    .type(UserDTO.class)
-                    .to("direct:create")
+                .consumes("application/json")
+                .produces("application/json")
+                .type(StoreDTO.class)
+                .to("direct:create")
                 .get("/{id}")
-                    .to("direct:findById")
-                    .produces("application/json")
+                .to("direct:findById")
+                .produces("application/json")
                 .delete("/{id}")
-                    .to("direct:deleteById")
+                .to("direct:deleteById")
 
-//                .put("/{id}").type(UserDTO.class).to("direct:update")
-//                .get("/saudacao/{id}").to("direct:saudacao")
+
+
         ;
 
         from("direct:create")
-                .routeId("createUser")
-                .log("Criando usuário: ${body}")
+                .routeId("createStore")
+                .log("Criando Loja: ${body}")
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
                 .setHeader("Accept-Encoding", constant("identity"))
                 .marshal().json(JsonLibrary.Jackson)
-                .to("https://price-hunt-api.onrender.com/user?bridgeEndpoint=true")
+                .log("Body depois de marshalizar e antes de mandar pra api: ${body}")
+                .to("http://localhost:8080/store?bridgeEndpoint=true")
                 .convertBodyTo(String.class)
                 .log("Mensagem crua recebida: ${body}")
                 .unmarshal("jsonDataFormat");
@@ -50,19 +51,19 @@ public class UserRouter extends RouteBuilder {
 
 
         from("direct:findById")
-                .routeId("findUserById")
-                .log("Buscando usuário com ID: ${header.id}")
+                .routeId("findStoreById")
+                .log("Buscando loja com ID: ${header.id}")
                 .setHeader("Accept-Encoding", constant("identity"))
                 .setHeader(Exchange.HTTP_METHOD, constant("GET"))
-                .toD("https://price-hunt-api.onrender.com/user/${header.id}?bridgeEndpoint=true")
+                .toD("https://price-hunt-api.onrender.com/store/${header.id}?bridgeEndpoint=true")
                 .unmarshal("jsonDataFormat");
 
         from("direct:deleteById")
-                .routeId("deleteUserById")
-                .log("Deletando usuário com ID: ${header.id}")
+                .routeId("deleteStoreById")
+                .log("Deletando loja com ID: ${header.id}")
                 .setHeader("Accept-Encoding", constant("identity"))
                 .setHeader(Exchange.HTTP_METHOD, constant("DELETE"))
-                .toD("https://price-hunt-api.onrender.com/user/${header.id}?bridgeEndpoint=true")
+                .toD("http://localhost:8080/store/${header.id}?bridgeEndpoint=true")
                 .unmarshal("jsonDataFormat");
 
     }

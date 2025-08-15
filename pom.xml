@@ -75,7 +75,16 @@
 		<dependency>
 			<groupId>org.apache.camel.springboot</groupId>
 			<artifactId>camel-http-starter</artifactId>
-			<version>3.20.2</version> <!-- ou a versão que estiver usando -->
+			<version>4.13.0</version> <!-- ou a versão que estiver usando -->
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-amqp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel.springboot</groupId>
+			<artifactId>camel-rabbitmq-starter</artifactId>
+			<version>3.11.4</version>
 		</dependency>
 	</dependencies>
 
