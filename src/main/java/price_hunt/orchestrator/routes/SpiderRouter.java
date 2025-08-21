@@ -53,31 +53,38 @@ public class SpiderRouter extends RouteBuilder {
                 + "&autoDelete=false"
                 + "&durable=true")
                 .routeId("SpiderConsumer")
+//                .unmarshal("jsonDataFormat") // Use the offerDataFormat defined in JacksonConfig
                 .process(exchange -> {
 
 //                    Object body = exchange.getIn().getBody();
 //                    System.out.println("Raw body class: " + body.getClass());
 //                    System.out.println("Raw body content: " + body.toString());
-
                     ObjectMapper mapper = new ObjectMapper();
-                    InputStream body = exchange.getIn().getBody(InputStream.class);
-                    System.out.println("Aqui" + body);
+                    String body = exchange.getIn().getBody(String.class);
+//                    System.out.println("Aqui" + body);
+                    System.out.println("AQUI ----->" + body);
                     List<OfferDTO> offers = mapper.readValue(body, new TypeReference<List<OfferDTO>>() {});
+                    System.out.println(offers.size() + " offers received");
                     offers.forEach(offer -> {
-                        if(offer.name() == null || offer.name().isEmpty()){
-                            System.out.println("Offer name is null or empty: " + offer);
+                        if(offer.description() == null || offer.description().isEmpty()){
+                            System.out.println("Offer description is null or empty: " + offer);
                         } else if (offer.price()<=0) {
                             System.out.println("Price is null: ");
                         } else if (offer.url() == null || offer.url().isEmpty()) {
                             System.out.println("Url is empty: ");
+                        }else  if (offer.dateTime() == null) {
+                            System.out.println("DateTime is null: ");
                         }
                         else {
+
                             String json = null;
                             try {
                                 json = mapper.writeValueAsString(offer);
                             } catch (JsonProcessingException e) {
                                 throw new RuntimeException(e);
                             }
+//                            System.out.println(json);
+
                             producerTemplate.sendBody("rabbitmq:exchange.offer"
                                     + "?queue=queue.offer"
                                     + "&autoDelete=false"

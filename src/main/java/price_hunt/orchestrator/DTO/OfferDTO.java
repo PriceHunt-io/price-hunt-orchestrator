@@ -1,12 +1,17 @@
 package price_hunt.orchestrator.DTO;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.time.LocalDateTime;
 
 public record OfferDTO (
-        String name,
+        String description,
         double price,
         String url,
-        String storeName
+        String storeUrl,
+
+        String dateTime
+
 ) {
 }
